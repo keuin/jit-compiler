@@ -3,6 +3,7 @@ package lib
 import (
 	"encoding/hex"
 	"fmt"
+	"reflect"
 	"syscall"
 	"unsafe"
 )
@@ -36,8 +37,8 @@ func (m MachineCode) Execute(debug bool) int {
 	}
 	copy(mmapFunc, m)
 	type execFunc func() int
-	unsafeFunc := (uintptr)(unsafe.Pointer(&mmapFunc))
-	f := *(*execFunc)(unsafe.Pointer(&unsafeFunc))
+	ptrSliceHeader := (*reflect.SliceHeader)(unsafe.Pointer(&mmapFunc))
+	f := *(*execFunc)(unsafe.Pointer(ptrSliceHeader.Data))
 	value := f()
 	if debug {
 		fmt.Println("\nResult :", value)
